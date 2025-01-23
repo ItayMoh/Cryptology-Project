@@ -11,7 +11,7 @@ import time
 
 current_dir = os.path.abspath(os.getcwd())
 
-cleanup_alice()
+#cleanup_alice()
 
 # Generate key (256 bit) for CAST256 OFB
 print("\n>>> Alice generates private CAST256-OFB key and IV <<<")

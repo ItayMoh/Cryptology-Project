@@ -12,7 +12,7 @@ import rabin
 current_dir = os.path.abspath(os.getcwd())
 
 #cleaning up previous run
-cleanup_bob()
+#cleanup_bob()
 
 # Bob Generates EC ElGamal keys
 print("\n>>> Bob generates a pair of EC ElGamal keys <<<")
