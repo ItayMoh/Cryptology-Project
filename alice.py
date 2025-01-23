@@ -3,7 +3,7 @@ import base64
 import os
 import pickle
 import common
-from ec_elgamal import Point, gen_keypair, ec_elgamal_encrypt, ec_elgamal_decrypt, Curve25519 as curve
+from ec_elgamal import ec_elgamal_encrypt, Curve25519 as curve
 import CAST256.mode_operation as mode_operation
 import rabin
 import time
@@ -20,11 +20,11 @@ iv_in_bytes = iv.to_bytes(16, byteorder='big')
 
 message = alice_private_key_in_bytes + iv_in_bytes
 
-while not os.path.isfile(f"{current_dir}/bob_public_key.txt"):
+while not os.path.isfile(f"{current_dir}/bob_public_key.pkl"):
     print("Waiting for bob's public key to be generated...")
     time.sleep(1)
 
-with open(f"{current_dir}/bob_public_key.txt", "rb") as f:
+with open(f"{current_dir}/bob_public_key.pkl", "rb") as f:
     bob_public_key = pickle.load(f)
     f.close()
 
@@ -36,7 +36,7 @@ print("\n>>> Alice encrypts CAST256-OFB key using EC ElGamal with Bob's public k
 encrypted_key_iv = ec_elgamal_encrypt(bob_public_key, message, curve)
 
 #Writing Alice's encrypted private key
-with open(f"{current_dir}/alice_encrypted_private.txt", "wb") as f:
+with open(f"{current_dir}/alice_encrypted_private.pkl", "wb") as f:
     pickle.dump(encrypted_key_iv, f)
     f.close()
 
@@ -46,17 +46,19 @@ with open(mp3_file_path, 'rb') as mp3_file:
     mp3_data = mp3_file.read()
 print("\n>>> Please wait until Alice finishes the Encryption step <<<")
 
-# Encode the image data in Base64
+# Encode the sound data in Base64
 mp3_base64 = base64.b64encode(mp3_data)
 mp3_base64_str = base64.b64encode(mp3_data).decode('utf-8')
 block_size = 16  # 16 bytes = 128 bits
-# Split the Base64 encoded image into blocks
+# Split the Base64 encoded sound into blocks
 blocks = common.split_into_blocks(mp3_base64, block_size)
 # Convert each block into an integer
 blocks_as_integers = [int.from_bytes(block, byteorder="big") for block in blocks]
-# Encrypt the image blocks
+
+# Encrypt the sound blocks
 encrypted_mp3 = mode_operation.encrypt(blocks_as_integers, alice_private_key, iv, "OFB")
 encrypted_mp3_data = base64.b64encode(common.integers_to_bytes(encrypted_mp3))
+
 encrypted_mp3_path = "encrypted_" + os.path.basename(mp3_file_path)
 with open(encrypted_mp3_path, 'wb') as encrypted_mp3_file:
     encrypted_mp3_file.write(encrypted_mp3_data)
