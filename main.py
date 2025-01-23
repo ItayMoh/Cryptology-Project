@@ -78,7 +78,7 @@ with open(decrypted_mp3_path, 'wb') as decrypted_image_file:
 
 print(f"\n>>> Decrypted sound file saved to {decrypted_mp3_path} <<<")
 
-# Generate the MAC for the original sound file (base64-encoded)
+# Generate the Signature for the original sound file (base64-encoded)
 signature, padd = rabin.digital_signature(mp3_base64_str)
 print(f"\nsigg for the original sound file: {signature}\n")
 

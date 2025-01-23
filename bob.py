@@ -4,11 +4,15 @@ import os
 import time
 import pickle
 import common
+from cleanup import cleanup_bob
 from ec_elgamal import gen_keypair, ec_elgamal_decrypt, Curve25519 as curve
 import CAST256.mode_operation as mode_operation
 import rabin
 
 current_dir = os.path.abspath(os.getcwd())
+
+#cleaning up previous run
+cleanup_bob()
 
 # Bob Generates EC ElGamal keys
 print("\n>>> Bob generates a pair of EC ElGamal keys <<<")
@@ -62,12 +66,19 @@ with open(decrypted_mp3_path, 'wb') as decrypted_sound_file:
 print(f"\n>>> Decrypted sound file saved to {decrypted_mp3_path} <<<")
 
 
-#Cleaning up environment
-print(f"\n>>> Removing  encrypted_{os.path.basename(mp3_file_path)}<<<")
-os.remove(f"{current_dir}/encrypted_{os.path.basename(mp3_file_path)}")
+#Checking file signature
+with open(f"{current_dir}/signature.pkl", "rb") as f:
+    signature = pickle.load(f)
+    f.close()
 
-print(f"\n>>> Removing Alice encrypted private key {current_dir}/alice_encrypted_private.pkl<<<")
-os.remove(f"{current_dir}/alice_encrypted_private.pkl")
+with open(f"{current_dir}/padd.pkl", "rb") as f:
+    padd = pickle.load(f)
+    f.close()
 
-print(f"\n>>> Removing bob's public key {current_dir}/bob_public_key.pkl<<<")
-os.remove(f"{current_dir}/bob_public_key.pkl")
+with open(decrypted_mp3_path, 'rb') as mp3_file:
+    mp3_data = mp3_file.read()
+
+# Verify the MAC for the base64-encoded decrypted sound file
+decrypted_mp3_base64 = base64.b64encode(original_mp3_data).decode('utf-8')
+rabin.verification(decrypted_mp3_base64, padd, signature)
+
