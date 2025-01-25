@@ -42,6 +42,7 @@ def root(m, p, q):
   i = 0
   while True:
     x = h(m) % nrabin
+    #Square Root Computation
     sig =   pow(p,q-2,q) * p * pow(x,(q+1)//4,q) 
     sig = ( pow(q,p-2,p) * q * pow(x,(p+1)//4,p) + sig ) % (nrabin) 
     if (sig * sig) % nrabin == x:
